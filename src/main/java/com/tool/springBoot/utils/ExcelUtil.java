@@ -318,7 +318,7 @@ import com.tool.springBoot.annotation.ExcelVOAttribute;
                         		}
 	                    		if(attr.isUrl()) {
 
-	                    			cell.setCellValue(field.get(vo) == null ? "" : String.valueOf(field.get(vo)));
+	                    			cell.setCellValue(field.get(vo) == null ? "" : String.valueOf(field.get(vo)).toLowerCase());
 		                            
 		                            HSSFCellStyle hlink_style = workbook.createCellStyle();
 		                            
@@ -340,7 +340,7 @@ import com.tool.springBoot.annotation.ExcelVOAttribute;
 	                        	}else {
 	                        		
 		                            cell.setCellValue(field.get(vo) == null ? ""  
-		                                    : String.valueOf(field.get(vo)));// 如果数据存在就填入,不存在填入空格.  
+		                                    : String.valueOf(field.get(vo)).toLowerCase());// 如果数据存在就填入,不存在填入空格.  
 	                             
 	                        	}
 	                        	

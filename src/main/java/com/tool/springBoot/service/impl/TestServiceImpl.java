@@ -24,9 +24,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.client.RestTemplate;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.deepoove.poi.data.PictureRenderData;
 import com.tool.springBoot.service.TestService;
 import com.tool.springBoot.utils.CommonUtils;
 import com.tool.springBoot.utils.ExcelUtil;
+import com.tool.springBoot.utils.FileUtils;
 import com.tool.springBoot.utils.WordUtils;
 import com.tool.springBoot.vo.TestVo;
 
@@ -250,7 +252,6 @@ public class TestServiceImpl implements TestService{
 	
 	public List<String> exportIdCard(JSONArray files ,String cookie) {
 		List<String> localUrls = new ArrayList<String>();
-		Map<String,String> fileMessages = new HashMap<String,String>();
 		for (int i = 0; i < files.size(); i++) {
 			JSONObject file = (JSONObject)files.get(i);
 			if("2".equals(file.get("fileType").toString())) {
@@ -262,7 +263,7 @@ public class TestServiceImpl implements TestService{
 //				}
 				String fileName = file.get("fileName").toString();
 				String suffix = fileName.substring(fileName.lastIndexOf("."));
-				String localUrl = CommonUtils.BASEPATH + "image\\"+file.get("id").toString() + suffix;
+				String localUrl = CommonUtils.BASEPATH + "image\\"+file.get("id").toString() + suffix.toLowerCase();
 				localUrls.add(localUrl);
 //				fileMessages.put(localUrl, file.get("filePath").toString());
 				downLoadFile(localUrl, file.get("fileId").toString(), cookie);
@@ -355,11 +356,12 @@ public class TestServiceImpl implements TestService{
 		 try {  
 			    
 	            fis = new FileInputStream(inExcelPath);  
-	            lists = util.importExcel("sheet1", fis);// 导入  
+	            lists = util.importExcel("曾检招", fis);// 导入  
 	            for (TestVo testVo : lists) {
 	            	Map<String, Object> datas = new HashMap<String, Object>();
-	    	    	
-	    	
+	            	if(testVo == null) {
+	            		continue;
+	            	}
 	            	String name = testVo.getName();
 	            	if(StringUtils.isEmpty(name)) {
 	            		name = "XXX";
@@ -386,6 +388,36 @@ public class TestServiceImpl implements TestService{
 	            	}
 	            	if(address.length()>9) {
 	            		address = address.substring(0, address.length() - 4);
+	            	}
+	            	if(!StringUtils.isEmpty(testVo.getIdCard1())) {
+	            		if(testVo.getIdCard1().endsWith(".JPG")
+	            				||testVo.getIdCard1().toLowerCase().endsWith(".PNG")) {
+	            			FileUtils.copyFileUsingFileChannels(new File( CommonUtils.BASEPATH+testVo.getIdCard1()),new File( CommonUtils.BASEPATH+"//change//"+testVo.getIdCard1().toLowerCase()));
+	            		}
+	            		if(testVo.getIdCard1().toLowerCase().endsWith(".jpg")
+	            				||testVo.getIdCard1().toLowerCase().endsWith(".png")) {
+	            			datas.put("picture1", new PictureRenderData(500, 300, CommonUtils.BASEPATH+testVo.getIdCard1().toLowerCase()));
+	            		}else {
+	            			datas.put("picture1",new PictureRenderData(500, 300, CommonUtils.BASEPATH+"temp.jpg") );
+	            		}
+	            	}
+	            	if(!StringUtils.isEmpty(testVo.getIdCard2())) {
+	            		if(testVo.getIdCard2().endsWith(".JPG")
+	            				||testVo.getIdCard2().toLowerCase().endsWith(".PNG")) {
+	            			FileUtils.copyFileUsingFileChannels(new File( CommonUtils.BASEPATH+testVo.getIdCard2()),new File( CommonUtils.BASEPATH+testVo.getIdCard2().toLowerCase()));
+	            		}
+	            		if(testVo.getIdCard2().toLowerCase().endsWith(".jpg")
+	            				||testVo.getIdCard2().toLowerCase().endsWith(".png")) {
+	            			datas.put("picture2", new PictureRenderData(500, 300, CommonUtils.BASEPATH+testVo.getIdCard2().toLowerCase()));
+	            		}else {
+	            			datas.put("picture2",new PictureRenderData(500, 300, CommonUtils.BASEPATH+"temp.jpg") );
+	            		}
+	            	}
+	            	
+	            	if(!StringUtils.isEmpty(testVo.getPhones())) {
+	            		datas.put("phones",testVo.getPhones());
+	            	}else {
+	            		datas.put("phones","");
 	            	}
 	            	
 	            	datas.put("name",name);
@@ -415,6 +447,8 @@ public class TestServiceImpl implements TestService{
 	        }
 		
 	}
+	
+	
 	
 	
 	
