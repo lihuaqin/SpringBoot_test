@@ -1,0 +1,61 @@
+package com.tool.springBoot.config;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+
+@SuppressWarnings("deprecation")
+@Configuration
+@EnableWebSecurity
+public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
+
+    @Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .authorizeRequests()
+                .antMatchers("/", "/home","/hello").permitAll()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .loginProcessingUrl("/userLogin")
+                .permitAll()
+                .and()
+            .logout()
+                .permitAll();
+        http.csrf().disable();
+        http.addFilter(openIdAuthenticationFilter());
+//        http.addFilterBefore(new BeforeLoginFilter(), UsernamePasswordAuthenticationFilter.class);
+    }
+    
+    /**
+     * 自定义登陆验证接口
+     */
+    public OpenIdAuthenticationFilter openIdAuthenticationFilter() throws Exception {
+      OpenIdAuthenticationFilter openIdAuthenticationFilter = new OpenIdAuthenticationFilter();
+      openIdAuthenticationFilter.setAuthenticationManager(authenticationManager());
+      //只有post请求才拦截
+      openIdAuthenticationFilter.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/login", "POST"));
+//      openIdAuthenticationFilter.setAuthenticationSuccessHandler(securityAuthenticationSuccessHandler);
+//      openIdAuthenticationFilter.setAuthenticationFailureHandler(securityAuthenticationFailureHandler);
+      return openIdAuthenticationFilter;
+    }
+
+    @Autowired
+    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
+        auth
+            .inMemoryAuthentication()
+                .withUser("user").password("password").roles("USER");
+    }
+	@Bean
+    public static NoOpPasswordEncoder passwordEncoder() {
+        return (NoOpPasswordEncoder) NoOpPasswordEncoder.getInstance();
+    }
+
+
+}

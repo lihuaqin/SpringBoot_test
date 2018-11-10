@@ -1,13 +1,13 @@
 package com.tool.springBoot.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.tool.springBoot.service.TestService;
 
 
-@RestController
+@Controller
 public class TestController {
 
 	@Autowired
@@ -15,6 +15,13 @@ public class TestController {
 	
 	@RequestMapping("/hello")
     public String index() {
-		return testService.myTest();
+		testService.testMybatis();
+		return "hello";
+    }
+	@RequestMapping("/userLogin")
+    public String userLogin() {
+//		return testService.myTest();
+		
+		return "userLogin";
     }
 }

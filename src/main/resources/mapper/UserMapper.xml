@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.tool.springBoot.dao.UserDao">
+    <resultMap id="BaseResultMap" type="com.tool.springBoot.vo.User">
+        <result column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="pwd" property="pwd"/>
+        <result column="email" property="email"/>
+    </resultMap>
+
+    <parameterMap id="User" type="com.tool.springBoot.vo.User"/>
+
+    <sql id="Base_Column_List">
+        id, name, pwd, email
+    </sql>
+
+    <select id="getUserByName" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from tb_user
+        where name = #{name}
+    </select>
+    
+    <select id="findAll" resultType = "com.tool.springBoot.vo.StudentVO">
+        select * from student;
+    </select>
+
+</mapper>

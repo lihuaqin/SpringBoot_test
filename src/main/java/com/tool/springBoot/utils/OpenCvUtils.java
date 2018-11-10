@@ -8,17 +8,17 @@ import org.opencv.core.Rect;
 import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.objdetect.CascadeClassifier;
 
-public class TestOpenCv {
+public class OpenCvUtils {
 	public static double calcArea(Rect rect)
 	{
 		return rect.width*rect.height;
 	}
 	
-	public static String xmlfilePath="I:\\tools\\opencv\\sources\\data\\haarcascades\\lbpcascade_frontalface2.xml";
+	public static String xmlfilePath="I:\\tools\\opencv\\sources\\data\\haarcascades\\haarcascade_frontalface_alt2.xml";
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		String inputImageFilename = "I:\\test\\139873.jpg";
+		String inputImageFilename = "I:\\test\\temp.jpg";
 		String outputImageFilename = "I:\\test\\2222.jpg";
 		faceCrop( inputImageFilename, outputImageFilename);
 
@@ -55,10 +55,10 @@ public class TestOpenCv {
 			int y =maxRect.y;
 			int height = maxRect.height;
 			int width = maxRect.width;
-			maxRect.x = x-(int)Math.ceil(x/3);
-			maxRect.y = y-(int)Math.ceil(y/3);
-			maxRect.height = height + (int)Math.ceil(2*y/3);
-			maxRect.width = width + (int)Math.ceil(x/3);
+			maxRect.x = x-(int)Math.ceil(x/16);
+			maxRect.y = y-(int)Math.ceil(y/4);
+			maxRect.height = height + (int)Math.ceil(y/2);
+			maxRect.width = width + (int)Math.ceil(x/8);
 			Mat roi_img = new Mat(image,maxRect); 
 			//创建临时的人脸拷贝图形
 			Mat tmp_img = new Mat();

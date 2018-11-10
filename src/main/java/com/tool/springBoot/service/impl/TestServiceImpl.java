@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -25,16 +26,25 @@ import org.springframework.web.client.RestTemplate;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.data.PictureRenderData;
+import com.tool.springBoot.dao.TestDao;
+import com.tool.springBoot.dao.UserDao;
 import com.tool.springBoot.service.TestService;
 import com.tool.springBoot.utils.CommonUtils;
 import com.tool.springBoot.utils.ExcelUtil;
-import com.tool.springBoot.utils.FileUtils;
+import com.tool.springBoot.utils.OpenCvUtils;
 import com.tool.springBoot.utils.WordUtils;
+import com.tool.springBoot.vo.StudentVO;
 import com.tool.springBoot.vo.TestVo;
+import com.tool.springBoot.vo.User;
 
 
 @Component
 public class TestServiceImpl implements TestService{
+	
+	@Autowired
+	private TestDao  testDao;
+	@Autowired
+	private UserDao userDao;
 
 	private final String COOKIE1 ="JSESSIONID=E997C9ACC6526B49CDEBAB9B39782A3E; user=zhuhh1%7C417%7C%E6%9C%B1%E7%84%95%E8%BE%89%7Cnull%7Cundefined%7C1%7C105532%7C%E5%8D%97%E4%BA%AC%E7%BD%97%E8%B1%AA%E7%94%B5%E5%99%A8%E6%9C%89%E9%99%90%E5%85%AC%E5%8F%B8";
 	private final String COOKIE ="JSESSIONID=C21F615AF0F791717F90C497E86C2DBE; user=zhuhh%7C223%7C%E6%9C%B1%E7%84%95%E8%BE%89%7Cnull%7Cundefined%7C0%7C1%7C%E5%B9%BF%E8%81%94%E8%B5%9B%E8%AE%AF";
@@ -390,25 +400,42 @@ public class TestServiceImpl implements TestService{
 	            		address = address.substring(0, address.length() - 4);
 	            	}
 	            	if(!StringUtils.isEmpty(testVo.getIdCard1())) {
-	            		if(testVo.getIdCard1().endsWith(".JPG")
-	            				||testVo.getIdCard1().toLowerCase().endsWith(".PNG")) {
-	            			FileUtils.copyFileUsingFileChannels(new File( CommonUtils.BASEPATH+testVo.getIdCard1()),new File( CommonUtils.BASEPATH+"//change//"+testVo.getIdCard1().toLowerCase()));
-	            		}
+//	            		if(testVo.getIdCard1().endsWith(".JPG")
+//	            				||testVo.getIdCard1().toLowerCase().endsWith(".PNG")) {
+//	            			FileUtils.copyFileUsingFileChannels(new File( CommonUtils.BASEPATH+testVo.getIdCard1()),new File( CommonUtils.BASEPATH+"//change//"+testVo.getIdCard1().toLowerCase()));
+//	            		}
 	            		if(testVo.getIdCard1().toLowerCase().endsWith(".jpg")
 	            				||testVo.getIdCard1().toLowerCase().endsWith(".png")) {
-	            			datas.put("picture1", new PictureRenderData(500, 300, CommonUtils.BASEPATH+testVo.getIdCard1().toLowerCase()));
+	            			datas.put("picture1", new PictureRenderData(700, 500, CommonUtils.BASEPATH+testVo.getIdCard1().toLowerCase()));
 	            		}else {
-	            			datas.put("picture1",new PictureRenderData(500, 300, CommonUtils.BASEPATH+"temp.jpg") );
+	            			datas.put("picture1",new PictureRenderData(700, 500, CommonUtils.BASEPATH+"temp.jpg") );
 	            		}
+	            		String picture1 = ((PictureRenderData)datas.get("picture1")).getPath().toString();
+	            		String pictureCutPath = picture1.replace("test", "temp");
+	            		File dest = new File(pictureCutPath);
+	            		if(!dest.getParentFile().exists()) {
+	    					dest.getParentFile().mkdirs();
+	    				}
+	            		try {
+	            			OpenCvUtils.faceCrop(picture1, pictureCutPath);
+		            		
+		            		datas.put("picture",new PictureRenderData(160, 220, pictureCutPath) );
+						} catch (Exception e) {
+							// TODO: handle exception
+							System.out.println(picture1);
+							e.printStackTrace();
+						}
+	            		
 	            	}
 	            	if(!StringUtils.isEmpty(testVo.getIdCard2())) {
-	            		if(testVo.getIdCard2().endsWith(".JPG")
-	            				||testVo.getIdCard2().toLowerCase().endsWith(".PNG")) {
-	            			FileUtils.copyFileUsingFileChannels(new File( CommonUtils.BASEPATH+testVo.getIdCard2()),new File( CommonUtils.BASEPATH+testVo.getIdCard2().toLowerCase()));
-	            		}
+//	            		if(testVo.getIdCard2().endsWith(".JPG")
+//	            				||testVo.getIdCard2().toLowerCase().endsWith(".PNG")) {
+//	            			FileUtils.copyFileUsingFileChannels(new File( CommonUtils.BASEPATH+testVo.getIdCard2()),new File( CommonUtils.BASEPATH+testVo.getIdCard2().toLowerCase()));
+//	            		}
 	            		if(testVo.getIdCard2().toLowerCase().endsWith(".jpg")
 	            				||testVo.getIdCard2().toLowerCase().endsWith(".png")) {
 	            			datas.put("picture2", new PictureRenderData(500, 300, CommonUtils.BASEPATH+testVo.getIdCard2().toLowerCase()));
+	            			
 	            		}else {
 	            			datas.put("picture2",new PictureRenderData(500, 300, CommonUtils.BASEPATH+"temp.jpg") );
 	            		}
@@ -447,6 +474,24 @@ public class TestServiceImpl implements TestService{
 	        }
 		
 	}
+
+
+	@Override
+	public void testMybatis() {
+		
+		testDao.findAll();
+		
+		
+	}
+	
+	 public User getUserByName(String name) {
+	        System.out.println("数据库查询。。。");
+	        User user= userDao.getUserByName(name);
+	       List<StudentVO> t= testDao.findAll();
+	        return userDao.getUserByName(name);
+	    }
+	
+	
 	
 	
 	

@@ -9,6 +9,7 @@ import java.util.*;
 
 public class ResttemplateDemoApplicationTests {
 
+	@SuppressWarnings("rawtypes")
 	public void simpleClientHttpRequestFactory() {
 		SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
 		requestFactory.setConnectTimeout(1000);
@@ -23,6 +24,7 @@ public class ResttemplateDemoApplicationTests {
 	/**
 	 * 发送一个get请求，并接受封装成map
 	 */
+	@SuppressWarnings("rawtypes")
 	public void restTemplateMap() {
 		RestTemplate restTemplate = new RestTemplate();
 		Map map=restTemplate.getForObject("https://api.weixin.qq.com/cgi-bin/getcallbackip?access_token=ACCESS_TOKEN",Map.class);
