@@ -476,11 +476,12 @@ public class TestServiceImpl implements TestService{
 	}
 
 
+	@SuppressWarnings("unused")
 	@Override
 	public void testMybatis() {
-		
-		testDao.findAll();
-		
+		System.out.println("start");
+		List<StudentVO> t=	testDao.findAll();
+		System.out.println("end");
 		
 	}
 	
